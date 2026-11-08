@@ -31,29 +31,9 @@ namespace QingTodo
             SHChangeNotify(0x08000000, 0, IntPtr.Zero, IntPtr.Zero);
             return path;
         }
-        // Windows Script Host is built into Windows. Release both COM references after saving.
         private static void CreateShortcut(string path, string arguments)
         {
-            object shell = null, shortcut = null;
-            try
-            {
-                Type shellType = Type.GetTypeFromProgID("WScript.Shell", true);
-                shell = Activator.CreateInstance(shellType);
-                shortcut = shellType.InvokeMember("CreateShortcut", System.Reflection.BindingFlags.InvokeMethod,
-                    null, shell, new object[] { path });
-                Type type = shortcut.GetType();
-                foreach (var pair in new[] {
-                    new[] { "TargetPath", ExePath }, new[] { "Arguments", arguments },
-                    new[] { "WorkingDirectory", Path.GetDirectoryName(ExePath) },
-                    new[] { "IconLocation", IconPath + ",0" }, new[] { "Description", "轻待办 · 简单记录，轻声提醒" } })
-                    type.InvokeMember(pair[0], System.Reflection.BindingFlags.SetProperty, null, shortcut, new object[] { pair[1] });
-                type.InvokeMember("Save", System.Reflection.BindingFlags.InvokeMethod, null, shortcut, null);
-            }
-            finally
-            {
-                if (shortcut != null) Marshal.FinalReleaseComObject(shortcut);
-                if (shell != null) Marshal.FinalReleaseComObject(shell);
-            }
+            WindowsShortcut.Write(path, ExePath, Path.GetDirectoryName(ExePath), arguments, IconPath);
         }
         [DllImport("user32.dll")] public static extern bool ShowWindow(IntPtr window, int command);
         [DllImport("shell32.dll")] private static extern void SHChangeNotify(uint eventId, uint flags, IntPtr item1, IntPtr item2);
