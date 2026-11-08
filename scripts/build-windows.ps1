@@ -16,5 +16,5 @@ Copy-Item -LiteralPath $installer -Destination (Join-Path $bundle '一键安装.
 Copy-Item -LiteralPath (Join-Path $repoRoot 'docs\安装说明.txt') -Destination (Join-Path $bundle '开始使用.txt')
 Compress-Archive -Path (Join-Path $bundle '*') -DestinationPath (Join-Path $downloadRoot 'QingToDo-Windows.zip') -Force
 $checksums = Get-ChildItem -LiteralPath $downloadRoot -File | Where-Object { $_.Extension -in @('.exe','.zip') } | Sort-Object Name | ForEach-Object { (Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash.ToLowerInvariant() + '  ' + $_.Name }
-[System.IO.File]::WriteAllLines((Join-Path $downloadRoot 'SHA256SUMS.txt'),$checksums,(New-Object System.Text.UTF8Encoding $false))
+[System.IO.File]::WriteAllText((Join-Path $downloadRoot 'SHA256SUMS.txt'),(($checksums -join "`n") + "`n"),(New-Object System.Text.UTF8Encoding $false))
 Write-Output 'Application, installer and download bundle built and checked.'
