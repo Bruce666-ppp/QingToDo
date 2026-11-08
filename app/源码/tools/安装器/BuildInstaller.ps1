@@ -19,13 +19,13 @@ $frameworkFolder = Join-Path $env:WINDIR 'Microsoft.NET\Framework64\v4.0.30319'
 if (-not (Test-Path -LiteralPath (Join-Path $frameworkFolder 'csc.exe'))) { $frameworkFolder = Join-Path $env:WINDIR 'Microsoft.NET\Framework\v4.0.30319' }
 $compiler = Join-Path $frameworkFolder 'csc.exe'
 $references = @('/reference:System.Drawing.dll','/reference:System.Windows.Forms.dll','/reference:System.Runtime.Serialization.dll','/reference:System.IO.Compression.dll','/reference:System.IO.Compression.FileSystem.dll')
-$sources = @((Join-Path $PSScriptRoot 'PackageEngine.cs'),(Join-Path $PSScriptRoot 'SetupIntegration.cs'),(Join-Path $PSScriptRoot 'InstallerForm.cs'),(Join-Path $AppDirectory '源码\Core.cs'))
+$sources = @((Join-Path $PSScriptRoot 'PackageEngine.cs'),(Join-Path $PSScriptRoot 'SetupIntegration.cs'),(Join-Path $PSScriptRoot 'InstallerForm.cs'),(Join-Path $AppDirectory '源码\Core.cs'),(Join-Path $AppDirectory '源码\WindowsShortcut.cs'))
 $buildArguments = @('/nologo','/target:winexe','/utf8output','/codepage:65001','/optimize+',('/out:' + $OutputPath),('/win32icon:' + (Join-Path $AppDirectory '轻待办-便签.ico')),('/win32manifest:' + (Join-Path $PSScriptRoot 'setup.manifest')),('/resource:' + $payloadZip + ',QingTodo.Payload.zip')) + $references + $sources
 & $compiler @buildArguments
 if ($LASTEXITCODE -ne 0) { throw '安装器编译失败' }
 if ($Check) {
     $testExecutable = Join-Path $buildFolder 'SetupTests.exe'
-    $testArguments = @('/nologo','/target:exe','/utf8output','/codepage:65001',('/out:' + $testExecutable),'/main:QingTodo.Setup.Tests',('/resource:' + $payloadZip + ',QingTodo.Payload.zip')) + $references + @($sources[0],$sources[1],$sources[3],(Join-Path $PSScriptRoot 'SetupTests.cs'))
+    $testArguments = @('/nologo','/target:exe','/utf8output','/codepage:65001',('/out:' + $testExecutable),'/main:QingTodo.Setup.Tests',('/resource:' + $payloadZip + ',QingTodo.Payload.zip')) + $references + @($sources[0],$sources[1],$sources[3],$sources[4],(Join-Path $PSScriptRoot 'SetupTests.cs'))
     & $compiler @testArguments
     if ($LASTEXITCODE -ne 0) { throw '安装器检查编译失败' }
     & $testExecutable $buildFolder
