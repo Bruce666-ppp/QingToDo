@@ -1,0 +1,40 @@
+# Dependencies and generated work
+node_modules/
+**/node_modules/
+.build/
+dist/
+bin/
+obj/
+*.log
+*.tmp
+.DS_Store
+Thumbs.db
+.vs/
+.vscode/
+
+# Local tasks and device preferences
+data/
+**/data/
+todos.json*
+*.bak
+*.damaged-*
+
+# Credentials and local configuration
+.env
+.env.*
+**/.env
+**/.env.*
+*.pem
+*.key
+*.pfx
+*.p12
+id_rsa*
+id_ed25519*
+credentials*.json
+*.secrets.json
+
+# Generated executables are kept only as reviewed website downloads
+*.exe
+*.zip
+!/site/downloads/QingToDo-Setup.exe
+!/site/downloads/QingToDo-Windows.zip
