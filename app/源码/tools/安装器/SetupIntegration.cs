@@ -36,8 +36,10 @@ namespace QingTodo.Setup
                     new[] { "WorkingDirectory", folder }, new[] { "Arguments", arguments },
                     new[] { "IconLocation", Path.Combine(folder, PackageEngine.IconFile) + ",0" },
                     new[] { "Description", "轻待办 · 简单记录，轻声提醒" } })
-                    shortcut.GetType().InvokeMember(pair[0], BindingFlags.SetProperty, null, shortcut, new object[] { pair[1] });
-                shortcut.GetType().InvokeMember("Save", BindingFlags.InvokeMethod, null, shortcut, null);
+                    try { shortcut.GetType().InvokeMember(pair[0], BindingFlags.SetProperty, null, shortcut, new object[] { pair[1] }); }
+                    catch (TargetInvocationException error) { throw new IOException("Cannot set shortcut " + pair[0] + " to " + pair[1], error.InnerException ?? error); }
+                try { shortcut.GetType().InvokeMember("Save", BindingFlags.InvokeMethod, null, shortcut, null); }
+                catch (TargetInvocationException error) { throw new IOException("Cannot save shortcut " + path, error.InnerException ?? error); }
             }
             finally { if (shortcut != null) Marshal.FinalReleaseComObject(shortcut); if (shell != null) Marshal.FinalReleaseComObject(shell); }
         }
