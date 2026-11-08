@@ -1,0 +1,60 @@
+name: Build and publish QingToDo
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+      - name: Build and test Windows app and installer
+        shell: pwsh
+        run: ./scripts/build-windows.ps1
+      - name: Check repository and website
+        shell: pwsh
+        run: |
+          node scripts/check-repository.mjs
+          node scripts/check-site.mjs
+      - name: Upload checked website
+        uses: actions/upload-artifact@v7
+        with:
+          name: qingtodo-site
+          path: site/
+          include-hidden-files: true
+          retention-days: 7
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          name: qingtodo-site
+          path: site
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: site
+      - name: Deploy GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
